@@ -1,11 +1,21 @@
 import os
 from launch import LaunchDescription
+from launch.actions import DeclareLaunchArgument
+from launch.conditions import IfCondition
+from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
 from ament_index_python.packages import get_package_share_directory
 from moveit_configs_utils import MoveItConfigsBuilder
 
 
 def generate_launch_description():
+
+    # 添加启动RViz的参数
+    arg_start_rviz = DeclareLaunchArgument(
+        'start_rviz',
+        default_value='true',
+        description='Whether to start RViz'
+    )
 
     # Command-line arguments
 
@@ -41,6 +51,7 @@ def generate_launch_description():
             moveit_config.planning_pipelines,
             moveit_config.robot_description_kinematics,
         ],
+        condition=IfCondition(LaunchConfiguration('start_rviz'))  # 根据参数决定是否启动RViz
     )
 
     # Static TF
@@ -98,6 +109,7 @@ def generate_launch_description():
 
     return LaunchDescription(
         [
+            arg_start_rviz,
             rviz_node,
             static_tf_node,
             robot_state_publisher,

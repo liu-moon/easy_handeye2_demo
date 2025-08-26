@@ -15,9 +15,19 @@ from easy_handeye2.common_launch import arg_calibration_type, arg_tracking_base_
 def generate_launch_description():
     arg_name = DeclareLaunchArgument('name')
 
+    # 添加启动RViz的参数
+    arg_start_rviz = DeclareLaunchArgument(
+        'start_rviz',
+        default_value='true',
+        description='Whether to start RViz'
+    )
+
     include_robot = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
-            os.path.join(get_package_share_directory('easy_handeye2_demo'), 'launch/run_move_group.launch.py')))
+            os.path.join(get_package_share_directory('easy_handeye2_demo'), 'launch/run_move_group.launch.py')),
+        launch_arguments={
+            'start_rviz': LaunchConfiguration('start_rviz'),  # 传递RViz参数
+        }.items())
 
     node_tracking = Node(
         package='easy_handeye2_demo',
@@ -47,6 +57,7 @@ def generate_launch_description():
         arg_tracking_marker_frame,
         arg_robot_base_frame,
         arg_robot_effector_frame,
+        arg_start_rviz,
         include_robot,
         node_tracking
     ])
